@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # wallet-app
 
 ## CLI Commands
@@ -20,3 +21,7 @@ npm run test
 ```
 
 For detailed explanation on how things work, checkout the [CLI Readme](https://github.com/developit/preact-cli/blob/master/README.md).
+=======
+# Defi-wallet
+wallet to connect to different chains
+>>>>>>> 139b915915202b24eb702e91881e17b79829f869
