@@ -67,18 +67,18 @@ const ConnectWallet = () => {
 
       setConnected(true);
 
-      const fetchNFTs = async (account) => {
+      const fetchNFTs = async (web3, account) => {
         try {
-          const response = await fetch(`https://api.darkblock.io/platform/matic/nft/0x62996f945e06ddaf1f22202b7d3911ac02a6786e/${account}`);
+          const response = await fetch(`https://api.opensea.io/api/v1/assets?owner=${account}`);
           const data = await response.json();
-          setNFTs(data);
+          setNFTs(data.assets); // Set the fetched NFTs to the state
         } catch (error) {
           console.error('Error fetching NFTs', error);
-          setNFTs([]);
+          setNFTs([]); // Set an empty array in case of an error
         }
       };
 
-      await fetchNFTs(selectedAccount);
+      await fetchNFTs(web3, selectedAccount);
 
       console.log(`Connected to ${network} wallet`);
     } catch (error) {
@@ -89,7 +89,7 @@ const ConnectWallet = () => {
   const disconnectWallet = async () => {
     try {
       if (typeof window.ethereum !== 'undefined') {
-        await window.ethereum.request({ method: 'eth_disconnect' });
+        await window.ethereum.request({ method: 'eth_logout' });
       } else if (typeof window.solana !== 'undefined') {
         await window.solana.disconnect();
       }

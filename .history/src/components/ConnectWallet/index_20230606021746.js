@@ -77,8 +77,9 @@ const ConnectWallet = () => {
           setNFTs([]);
         }
       };
+      
 
-      await fetchNFTs(selectedAccount);
+      await fetchNFTs(web3, selectedAccount);
 
       console.log(`Connected to ${network} wallet`);
     } catch (error) {
@@ -89,7 +90,7 @@ const ConnectWallet = () => {
   const disconnectWallet = async () => {
     try {
       if (typeof window.ethereum !== 'undefined') {
-        await window.ethereum.request({ method: 'eth_disconnect' });
+        await window.ethereum.request({ method: 'eth_logout' });
       } else if (typeof window.solana !== 'undefined') {
         await window.solana.disconnect();
       }

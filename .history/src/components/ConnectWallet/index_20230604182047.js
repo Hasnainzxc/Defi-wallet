@@ -13,11 +13,15 @@ const ConnectWallet = () => {
   const connectToWallet = async (wallet) => {
     try {
       let provider;
+      let chainId;
       let network;
 
       switch (wallet) {
         case 'ethereum':
           if (typeof window.ethereum !== 'undefined') {
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+            chainId = await window.ethereum.request({ method: 'eth_chainId' });
+
             provider = window.ethereum;
             network = 'Ethereum';
           } else {
@@ -28,6 +32,15 @@ const ConnectWallet = () => {
 
         case 'polygon':
           if (typeof window.ethereum !== 'undefined') {
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+            await window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: '0x89' }], // Use the correct chain ID format
+            });
+
+            chainId = await window.ethereum.request({ method: 'eth_chainId' });
+
             provider = window.ethereum;
             network = 'Polygon';
           } else {
@@ -37,13 +50,12 @@ const ConnectWallet = () => {
           break;
 
         case 'solana':
-          if (typeof window.solana !== 'undefined') {
-            provider = window.solana;
-            network = 'Solana';
-          } else {
-            console.log('Solana wallet not detected');
-            return;
-          }
+          // Implement Solana wallet connection using the appropriate library
+          // Set the necessary values for Solana wallet connection
+          // chainId = ...;
+          // provider = ...;
+          // network = 'Solana';
+          // ...
           break;
 
         default:
@@ -51,58 +63,34 @@ const ConnectWallet = () => {
           return;
       }
 
-      await provider.request({ method: 'eth_requestAccounts' });
-
       const web3 = new Web3(provider);
 
       const accounts = await web3.eth.getAccounts();
-      const selectedAccount = accounts[0];
-      setAccount(selectedAccount);
+      const account = accounts[0];
+      setAccount(account);
 
-      const selectedChainId = await web3.eth.getChainId();
-      setChainId(selectedChainId);
-
-      const selectedBalance = await web3.eth.getBalance(selectedAccount);
-      setBalance(selectedBalance);
+      const balance = await web3.eth.getBalance(account);
+      setBalance(balance);
 
       setConnected(true);
+      setChainId(chainId);
 
-      const fetchNFTs = async (account) => {
+      const fetchNFTs = async (web3, account) => {
         try {
-          const response = await fetch(`https://api.darkblock.io/platform/matic/nft/0x62996f945e06ddaf1f22202b7d3911ac02a6786e/${account}`);
+          const response = await fetch(`https://api.opensea.io/api/v1/assets?owner=${account}`);
           const data = await response.json();
-          setNFTs(data);
+          setNFTs(data.assets); // Set the fetched NFTs to the state
         } catch (error) {
           console.error('Error fetching NFTs', error);
-          setNFTs([]);
+          setNFTs([]); // Set an empty array in case of an error
         }
       };
 
-      await fetchNFTs(selectedAccount);
+      await fetchNFTs(web3, account);
 
       console.log(`Connected to ${network} wallet`);
     } catch (error) {
       console.error('Error connecting to wallet', error);
-    }
-  };
-
-  const disconnectWallet = async () => {
-    try {
-      if (typeof window.ethereum !== 'undefined') {
-        await window.ethereum.request({ method: 'eth_disconnect' });
-      } else if (typeof window.solana !== 'undefined') {
-        await window.solana.disconnect();
-      }
-
-      setConnected(false);
-      setAccount('');
-      setBalance('0');
-      setChainId('');
-      setNFTs([]);
-
-      console.log('Wallet disconnected');
-    } catch (error) {
-      console.error('Error disconnecting wallet', error);
     }
   };
 
@@ -116,12 +104,6 @@ const ConnectWallet = () => {
             <p>Chain ID: {chainId}</p>
             <p>Account Balance: {balance}</p>
             <p>NFTs: {nfts.length}</p> {/* Render the length of fetched NFTs */}
-            <button
-              class="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-lg"
-              onClick={disconnectWallet}
-            >
-              Disconnect Wallet
-            </button>
           </div>
         ) : (
           <div class="flex flex-col gap-4">

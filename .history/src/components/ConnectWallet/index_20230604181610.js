@@ -1,5 +1,5 @@
 import { h } from 'preact';
-import { useState } from 'preact/hooks';
+import { useState, useEffect } from 'preact/hooks';
 import { FiLink } from 'react-icons/fi';
 import Web3 from 'web3';
 
@@ -8,42 +8,70 @@ const ConnectWallet = () => {
   const [account, setAccount] = useState('');
   const [balance, setBalance] = useState('0');
   const [chainId, setChainId] = useState('');
-  const [nfts, setNFTs] = useState([]);
+  const [fetchNFTs, setNFTs] = useState ([]);
 
   const connectToWallet = async (wallet) => {
     try {
       let provider;
+      let chainId;
       let network;
+      
 
       switch (wallet) {
         case 'ethereum':
+          // Check if MetaMask is installed
           if (typeof window.ethereum !== 'undefined') {
+            // Request access to the user's MetaMask account
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+            // Get the current chain ID
+            chainId = await window.ethereum.request({ method: 'eth_chainId' });
+
             provider = window.ethereum;
             network = 'Ethereum';
           } else {
+            // MetaMask not detected
             console.log('MetaMask not detected');
             return;
           }
           break;
 
         case 'polygon':
+          // Check if MetaMask is installed
           if (typeof window.ethereum !== 'undefined') {
+            // Request access to the user's MetaMask account
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+            // Switch to the Polygon network (Chain ID 137)
+            await window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: '137' }],
+            });
+
+            // Get the current chain ID
+            chainId = await window.ethereum.request({ method: 'eth_chainId' });
+
             provider = window.ethereum;
             network = 'Polygon';
           } else {
+            // MetaMask not detected
             console.log('MetaMask not detected');
             return;
           }
           break;
 
         case 'solana':
-          if (typeof window.solana !== 'undefined') {
-            provider = window.solana;
-            network = 'Solana';
-          } else {
-            console.log('Solana wallet not detected');
-            return;
-          }
+          // Connect to Solana wallet using the Solana Web3 library
+          // Implement the connection to Solana wallet according to the library you are using
+          // For example, using @solana/web3.js library
+          // const connection = new web3.Connection('https://api.mainnet-beta.solana.com');
+          // const wallet = new web3.Wallet(provider);
+          // ...
+          // Set the necessary values for Solana wallet connection
+          // chainId = ...;
+          // provider = ...;
+          // network = 'Solana';
+          // ...
           break;
 
         default:
@@ -51,58 +79,37 @@ const ConnectWallet = () => {
           return;
       }
 
-      await provider.request({ method: 'eth_requestAccounts' });
-
+      // Create a Web3 instance using the selected provider
       const web3 = new Web3(provider);
 
+      // Get the user's account address
       const accounts = await web3.eth.getAccounts();
-      const selectedAccount = accounts[0];
-      setAccount(selectedAccount);
+      const account = accounts[0];
+      setAccount(account);
 
-      const selectedChainId = await web3.eth.getChainId();
-      setChainId(selectedChainId);
-
-      const selectedBalance = await web3.eth.getBalance(selectedAccount);
-      setBalance(selectedBalance);
+      // Get the user's account balance
+      const balance = await web3.eth.getBalance(account);
+      setBalance(balance);
 
       setConnected(true);
+      setChainId(chainId);
 
-      const fetchNFTs = async (account) => {
+      const fetchNFTs = async (web3, account) => {
         try {
-          const response = await fetch(`https://api.darkblock.io/platform/matic/nft/0x62996f945e06ddaf1f22202b7d3911ac02a6786e/${account}`);
+          // Fetch the user's NFTs using the OpenSea API
+          const response = await fetch(`https://api.opensea.io/api/v1/assets?owner=${account}`);
           const data = await response.json();
-          setNFTs(data);
+          return data.assets;
         } catch (error) {
           console.error('Error fetching NFTs', error);
-          setNFTs([]);
+          return [];
         }
       };
-
-      await fetchNFTs(selectedAccount);
+      
 
       console.log(`Connected to ${network} wallet`);
     } catch (error) {
       console.error('Error connecting to wallet', error);
-    }
-  };
-
-  const disconnectWallet = async () => {
-    try {
-      if (typeof window.ethereum !== 'undefined') {
-        await window.ethereum.request({ method: 'eth_disconnect' });
-      } else if (typeof window.solana !== 'undefined') {
-        await window.solana.disconnect();
-      }
-
-      setConnected(false);
-      setAccount('');
-      setBalance('0');
-      setChainId('');
-      setNFTs([]);
-
-      console.log('Wallet disconnected');
-    } catch (error) {
-      console.error('Error disconnecting wallet', error);
     }
   };
 
@@ -115,13 +122,7 @@ const ConnectWallet = () => {
             <p>Connected Account: {account}</p>
             <p>Chain ID: {chainId}</p>
             <p>Account Balance: {balance}</p>
-            <p>NFTs: {nfts.length}</p> {/* Render the length of fetched NFTs */}
-            <button
-              class="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-lg"
-              onClick={disconnectWallet}
-            >
-              Disconnect Wallet
-            </button>
+            <p>nfts: {nfts}</p>
           </div>
         ) : (
           <div class="flex flex-col gap-4">
