@@ -1,7 +1,8 @@
 import { h } from 'preact';
-import { useState } from 'preact/hooks';
-import { FiLink } from 'react-icons/fi';
+import { useState, useEffect } from 'preact/hooks';
 import Web3 from 'web3';
+import { PolygonDarkblockWidget } from "@darkblock.io/matic-widget";
+
 
 const ConnectWallet = () => {
   const [connected, setConnected] = useState(false);
@@ -9,6 +10,7 @@ const ConnectWallet = () => {
   const [balance, setBalance] = useState('0');
   const [chainId, setChainId] = useState('');
   const [nfts, setNFTs] = useState([]);
+  const [signature, setSignature] = useState('');
 
   const connectToWallet = async (wallet) => {
     try {
@@ -99,6 +101,7 @@ const ConnectWallet = () => {
       setBalance('0');
       setChainId('');
       setNFTs([]);
+      setSignature('');
 
       console.log('Wallet disconnected');
     } catch (error) {
@@ -106,49 +109,72 @@ const ConnectWallet = () => {
     }
   };
 
+  const verifySignature = async () => {
+    try {
+      const web3 = new Web3(window.ethereum);
+      const message = 'Verification Message'; // Customize the message to be verified
+
+      const signedMessage = await web3.eth.personal.sign(
+        message,
+        account,
+        ''
+      );
+
+      setSignature(signedMessage);
+
+      // TODO: Send the signed message to the server for verification
+    } catch (error) {
+      console.error('Error verifying signature', error);
+    }
+  };
+
   return (
-    <div class="flex justify-center items-center h-screen">
-      <div class="p-8 bg-gray-100 rounded-lg shadow-lg">
-        <h1 class="text-2xl font-bold mb-4">Crypto Wallet</h1>
-        {connected ? (
-          <div>
-            <p>Connected Account: {account}</p>
-            <p>Chain ID: {chainId}</p>
-            <p>Account Balance: {balance}</p>
-            <p>NFTs: {nfts.length}</p> {/* Render the length of fetched NFTs */}
-            <button
-              class="flex items-center gap-2 bg-gray-500 text-white px-4 py-2 rounded-lg"
-              onClick={disconnectWallet}
-            >
-              Disconnect Wallet
-            </button>
-          </div>
-        ) : (
-          <div class="flex flex-col gap-4">
-            <button
-              class="flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-lg"
-              onClick={() => connectToWallet('polygon')}
-            >
-              <FiLink />
-              Connect to Polygon
-            </button>
-            <button
-              class="flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-lg"
-              onClick={() => connectToWallet('ethereum')}
-            >
-              <FiLink />
-              Connect to Ethereum
-            </button>
-            <button
-              class="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg"
-              onClick={() => connectToWallet('solana')}
-            >
-              <FiLink />
-              Connect to Solana
-            </button>
-          </div>
-        )}
-      </div>
+    <div>
+      {connected ? (
+        <div>
+          <p>Connected to {chainId}</p>
+          <p>Account: {account}</p>
+          <p>Balance: {balance}</p>
+          <button onClick={disconnectWallet}>Disconnect</button>
+          <button onClick={verifySignature}>Verify Signature</button>
+          {signature && <p>Signature: {signature}</p>}
+        </div>
+      ) : (
+        <div>
+          <button onClick={() => connectToWallet('ethereum')}>Connect to Ethereum</button>
+          <button onClick={() => connectToWallet('polygon')}>Connect to Polygon</button>
+          <button onClick={() => connectToWallet('solana')}>Connect to Solana</button>
+        </div>
+      )}
+
+      {nfts.length > 0 && (
+        <div>
+          <h2>Your NFTs</h2>
+          <ul>
+            {nfts.map((nft) => (
+              <li key={nft.tokenId}>{nft.name}</li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {connected && (
+        <PolygonDarkblockWidget
+          contractAddress="nft contract address"
+          tokenId="nft token id"
+          w3={Web3}
+          cb={(param) => console.log(param)}
+          config={{
+            customCssClass: "",             
+            debug: false,                   
+            imgViewer: {                    
+              showRotationControl: true,
+              autoHideControls: true,
+              controlsFadeDelay: true,
+            },
+          }}
+        />
+      )}
     </div>
   );
 };
