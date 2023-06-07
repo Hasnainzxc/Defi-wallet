@@ -11,8 +11,6 @@ const ConnectWallet = () => {
   const [chainId, setChainId] = useState('');
   const [nfts, setNFTs] = useState([]);
   const [signature, setSignature] = useState('');
-  const [authenticated, setAuthenticated] = useState(false);
-
 
   const connectToWallet = async (wallet) => {
     try {
@@ -111,11 +109,6 @@ const ConnectWallet = () => {
       console.error('Error disconnecting wallet', error);
     }
   };
-  const handleAuthentication = () => {
-    console.log('Authenticated as the owner');
-    setAuthenticated(true);
-  };
-  
 
   const verifySignature = async () => {
     try {
@@ -200,11 +193,7 @@ const ConnectWallet = () => {
             },
           }}
         />
-        
       )}
-     
-    
-
     </div>
   );
 };

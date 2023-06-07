@@ -11,8 +11,6 @@ const ConnectWallet = () => {
   const [chainId, setChainId] = useState('');
   const [nfts, setNFTs] = useState([]);
   const [signature, setSignature] = useState('');
-  const [authenticated, setAuthenticated] = useState(false);
-
 
   const connectToWallet = async (wallet) => {
     try {
@@ -111,11 +109,6 @@ const ConnectWallet = () => {
       console.error('Error disconnecting wallet', error);
     }
   };
-  const handleAuthentication = () => {
-    console.log('Authenticated as the owner');
-    setAuthenticated(true);
-  };
-  
 
   const verifySignature = async () => {
     try {
@@ -152,7 +145,6 @@ const ConnectWallet = () => {
 
     checkMetaMask();
   }, []);
-
   return (
     <div>
       {connected ? (
@@ -161,8 +153,32 @@ const ConnectWallet = () => {
           <p>Account: {account}</p>
           <p>Balance: {balance}</p>
           <button onClick={disconnectWallet}>Disconnect</button>
-          <button onClick={verifySignature}>Verify Signature</button>
+          <button onClick={handleAuthentication}>Authenticate</button>
           {signature && <p>Signature: {signature}</p>}
+          {connected && (
+            <Authentication
+              contractAddress="0x62996f945e06ddaf1f22202b7d3911ac02a6786e" // Replace with your contract address
+              tokenId="1" // Replace with your token ID
+              onAuthenticated={handleAuthentication}
+            />
+          )}
+          {connected && (
+            <PolygonDarkblockWidget
+              contractAddress="0x62996f945e06ddaf1f22202b7d3911ac02a6786e" // Replace with your contract address
+              tokenId="1" // Replace with your token ID
+              w3={Web3}
+              cb={(param) => console.log(param)}
+              config={{
+                customCssClass: "",
+                debug: false,
+                imgViewer: {
+                  showRotationControl: true,
+                  autoHideControls: true,
+                  controlsFadeDelay: true,
+                },
+              }}
+            />
+          )}
         </div>
       ) : (
         <div>
@@ -182,29 +198,6 @@ const ConnectWallet = () => {
           </ul>
         </div>
       )}
-      
-
-      {connected && (
-        <PolygonDarkblockWidget
-          contractAddress="0x62996f945e06ddaf1f22202b7d3911ac02a6786e" // Replace with your contract address
-          tokenId="1" // Replace with your token ID
-          w3={Web3}
-          cb={(param) => console.log(param)}
-          config={{
-            customCssClass: "",
-            debug: false,
-            imgViewer: {
-              showRotationControl: true,
-              autoHideControls: true,
-              controlsFadeDelay: true,
-            },
-          }}
-        />
-        
-      )}
-     
-    
-
     </div>
   );
 };

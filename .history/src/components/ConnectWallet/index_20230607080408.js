@@ -4,6 +4,7 @@ import Web3 from 'web3';
 import { PolygonDarkblockWidget } from "@darkblock.io/matic-widget";
 
 
+
 const ConnectWallet = () => {
   const [connected, setConnected] = useState(false);
   const [account, setAccount] = useState('');
@@ -11,8 +12,6 @@ const ConnectWallet = () => {
   const [chainId, setChainId] = useState('');
   const [nfts, setNFTs] = useState([]);
   const [signature, setSignature] = useState('');
-  const [authenticated, setAuthenticated] = useState(false);
-
 
   const connectToWallet = async (wallet) => {
     try {
@@ -111,11 +110,6 @@ const ConnectWallet = () => {
       console.error('Error disconnecting wallet', error);
     }
   };
-  const handleAuthentication = () => {
-    console.log('Authenticated as the owner');
-    setAuthenticated(true);
-  };
-  
 
   const verifySignature = async () => {
     try {
@@ -140,7 +134,17 @@ const ConnectWallet = () => {
       console.error('Error verifying signature', error);
     }
   };
-  
+  const handleAuthentication = () => {
+    console.log('Authenticated as the owner');
+    // Perform actions when authentication is successful
+  };
+
+  useEffect(() => {
+    const checkMetaMask = () => {
+      if (typeof window.ethereum !== 'undefined') {
+        connectToWallet('ethereum');
+      }
+    };
 
 
   useEffect(() => {
@@ -182,7 +186,6 @@ const ConnectWallet = () => {
           </ul>
         </div>
       )}
-      
 
       {connected && (
         <PolygonDarkblockWidget
@@ -200,11 +203,7 @@ const ConnectWallet = () => {
             },
           }}
         />
-        
       )}
-     
-    
-
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import Web3 from 'web3';
 import { PolygonDarkblockWidget } from "@darkblock.io/matic-widget";
+import { Authentication } from "@darkblock.io/shared-components";
 
 
 const ConnectWallet = () => {
@@ -11,8 +12,6 @@ const ConnectWallet = () => {
   const [chainId, setChainId] = useState('');
   const [nfts, setNFTs] = useState([]);
   const [signature, setSignature] = useState('');
-  const [authenticated, setAuthenticated] = useState(false);
-
 
   const connectToWallet = async (wallet) => {
     try {
@@ -111,11 +110,6 @@ const ConnectWallet = () => {
       console.error('Error disconnecting wallet', error);
     }
   };
-  const handleAuthentication = () => {
-    console.log('Authenticated as the owner');
-    setAuthenticated(true);
-  };
-  
 
   const verifySignature = async () => {
     try {
@@ -140,8 +134,6 @@ const ConnectWallet = () => {
       console.error('Error verifying signature', error);
     }
   };
-  
-
 
   useEffect(() => {
     const checkMetaMask = () => {
@@ -182,7 +174,6 @@ const ConnectWallet = () => {
           </ul>
         </div>
       )}
-      
 
       {connected && (
         <PolygonDarkblockWidget
@@ -200,11 +191,7 @@ const ConnectWallet = () => {
             },
           }}
         />
-        
       )}
-     
-    
-
     </div>
   );
 };

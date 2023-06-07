@@ -2,7 +2,7 @@ import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import Web3 from 'web3';
 import { PolygonDarkblockWidget } from "@darkblock.io/matic-widget";
-
+import { Authentication } from "@darkblock.io/shared-components";
 
 const ConnectWallet = () => {
   const [connected, setConnected] = useState(false);
@@ -11,8 +11,6 @@ const ConnectWallet = () => {
   const [chainId, setChainId] = useState('');
   const [nfts, setNFTs] = useState([]);
   const [signature, setSignature] = useState('');
-  const [authenticated, setAuthenticated] = useState(false);
-
 
   const connectToWallet = async (wallet) => {
     try {
@@ -111,11 +109,6 @@ const ConnectWallet = () => {
       console.error('Error disconnecting wallet', error);
     }
   };
-  const handleAuthentication = () => {
-    console.log('Authenticated as the owner');
-    setAuthenticated(true);
-  };
-  
 
   const verifySignature = async () => {
     try {
@@ -140,7 +133,10 @@ const ConnectWallet = () => {
       console.error('Error verifying signature', error);
     }
   };
-  
+  const handleAuthentication = () => {
+    console.log('Authenticated as the owner');
+    // Perform actions when authentication is successful
+  };
 
 
   useEffect(() => {
@@ -162,6 +158,7 @@ const ConnectWallet = () => {
           <p>Balance: {balance}</p>
           <button onClick={disconnectWallet}>Disconnect</button>
           <button onClick={verifySignature}>Verify Signature</button>
+          <button onClick={handleAuthentication}>Authenticate</button>
           {signature && <p>Signature: {signature}</p>}
         </div>
       ) : (
@@ -182,7 +179,13 @@ const ConnectWallet = () => {
           </ul>
         </div>
       )}
-      
+      {connected && (
+            <Authentication
+              contractAddress="0x62996f945e06ddaf1f22202b7d3911ac02a6786e" // Replace with your contract address
+              tokenId="1" // Replace with your token ID
+              onAuthenticated={handleAuthentication}
+            />
+          )}
 
       {connected && (
         <PolygonDarkblockWidget
@@ -200,11 +203,7 @@ const ConnectWallet = () => {
             },
           }}
         />
-        
       )}
-     
-    
-
     </div>
   );
 };

@@ -200,9 +200,31 @@ const ConnectWallet = () => {
             },
           }}
         />
-        
       )}
-     
+     {authenticated && (
+  <Authentication
+    contractAddress="0x62996f945e06ddaf1f22202b7d3911ac02a6786e" // Replace with your contract address
+    tokenId="1" // Replace with your token ID
+    onAuthenticated={handleAuthentication}
+  >
+    <PolygonDarkblockWidget
+      contractAddress="0x62996f945e06ddaf1f22202b7d3911ac02a6786e" // Replace with your contract address
+      tokenId="1" // Replace with your token ID
+      w3={Web3}
+      cb={(param) => console.log(param)}
+      config={{
+        customCssClass: "",
+        debug: false,
+        imgViewer: {
+          showRotationControl: true,
+          autoHideControls: true,
+          controlsFadeDelay: true,
+        },
+      }}
+    />
+  </Authentication>
+)}
+
     
 
     </div>
