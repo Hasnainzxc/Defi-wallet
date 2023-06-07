@@ -28,6 +28,8 @@
     "sirv-cli": "^2.0.2"
   },
   "dependencies": {
+    "@darkblock.io/matic-widget": "^0.2.49",
+    "@darkblock.io/shared-components": "^0.2.52",
     "preact": "^10.11.3",
     "preact-render-to-string": "^5.2.6",
     "preact-router": "^3.2.1",

@@ -2,8 +2,6 @@ import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import Web3 from 'web3';
 import { PolygonDarkblockWidget } from "@darkblock.io/matic-widget";
-import { Authentication } from "@darkblock.io/shared-components";
-
 
 const ConnectWallet = () => {
   const [connected, setConnected] = useState(false);
@@ -177,8 +175,8 @@ const ConnectWallet = () => {
 
       {connected && (
         <PolygonDarkblockWidget
-          contractAddress="0x62996f945e06ddaf1f22202b7d3911ac02a6786e" // Replace with your contract address
-          tokenId="1" // Replace with your token ID
+          contractAddress="nft contract address"
+          tokenId="nft token id"
           w3={Web3}
           cb={(param) => console.log(param)}
           config={{

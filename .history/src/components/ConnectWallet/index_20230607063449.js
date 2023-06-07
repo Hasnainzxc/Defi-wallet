@@ -2,8 +2,6 @@ import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import Web3 from 'web3';
 import { PolygonDarkblockWidget } from "@darkblock.io/matic-widget";
-import { Authentication } from "@darkblock.io/shared-components";
-
 
 const ConnectWallet = () => {
   const [connected, setConnected] = useState(false);
@@ -73,7 +71,7 @@ const ConnectWallet = () => {
 
       const fetchNFTs = async (account) => {
         try {
-          const response = await fetch(`https://api.darkblock.io/platform/matic/nft/0x62996f945e06ddaf1F22202B7D3911Ac02A6786E/${account}`);
+          const response = await fetch(`https://api.darkblock.io/platform/matic/nft/0x62996f945e06ddaf1f22202b7d3911ac02a6786e/1/${account}`);
           const data = await response.json();
           setNFTs(data);
         } catch (error) {
@@ -177,8 +175,8 @@ const ConnectWallet = () => {
 
       {connected && (
         <PolygonDarkblockWidget
-          contractAddress="0x62996f945e06ddaf1f22202b7d3911ac02a6786e" // Replace with your contract address
-          tokenId="1" // Replace with your token ID
+          contractAddress="nft contract address"
+          tokenId="nft token id"
           w3={Web3}
           cb={(param) => console.log(param)}
           config={{

@@ -2,7 +2,6 @@ import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import Web3 from 'web3';
 import { PolygonDarkblockWidget } from "@darkblock.io/matic-widget";
-import { Authentication } from "@darkblock.io/shared-components";
 
 
 const ConnectWallet = () => {
@@ -11,7 +10,6 @@ const ConnectWallet = () => {
   const [balance, setBalance] = useState('0');
   const [chainId, setChainId] = useState('');
   const [nfts, setNFTs] = useState([]);
-  const [signature, setSignature] = useState('');
 
   const connectToWallet = async (wallet) => {
     try {
@@ -59,8 +57,7 @@ const ConnectWallet = () => {
       const web3 = new Web3(provider);
 
       const accounts = await web3.eth.getAccounts();
-      const selectedAccount = accounts[0].toLowerCase(); // Convert the account to lowercase
-
+      const selectedAccount = accounts[0];
       setAccount(selectedAccount);
 
       const selectedChainId = await web3.eth.getChainId();
@@ -73,7 +70,7 @@ const ConnectWallet = () => {
 
       const fetchNFTs = async (account) => {
         try {
-          const response = await fetch(`https://api.darkblock.io/platform/matic/nft/0x62996f945e06ddaf1F22202B7D3911Ac02A6786E/${account}`);
+          const response = await fetch(`https://api.darkblock.io/platform/matic/nft/0x62996f945e06ddaf1f22202b7d3911ac02a6786e/${account}`);
           const data = await response.json();
           setNFTs(data);
         } catch (error) {
@@ -103,47 +100,12 @@ const ConnectWallet = () => {
       setBalance('0');
       setChainId('');
       setNFTs([]);
-      setSignature('');
 
       console.log('Wallet disconnected');
     } catch (error) {
       console.error('Error disconnecting wallet', error);
     }
   };
-
-  const verifySignature = async () => {
-    try {
-      if (!window.ethereum) {
-        console.log('MetaMask not detected');
-        return;
-      }
-
-      const web3 = new Web3(window.ethereum);
-      const message = 'Verification Message'; // Customize the message to be verified
-
-      const signedMessage = await web3.eth.personal.sign(
-        message,
-        account,
-        ''
-      );
-
-      setSignature(signedMessage);
-
-      // TODO: Send the signed message to the server for verification
-    } catch (error) {
-      console.error('Error verifying signature', error);
-    }
-  };
-
-  useEffect(() => {
-    const checkMetaMask = () => {
-      if (typeof window.ethereum !== 'undefined') {
-        connectToWallet('ethereum');
-      }
-    };
-
-    checkMetaMask();
-  }, []);
 
   return (
     <div>
@@ -153,8 +115,6 @@ const ConnectWallet = () => {
           <p>Account: {account}</p>
           <p>Balance: {balance}</p>
           <button onClick={disconnectWallet}>Disconnect</button>
-          <button onClick={verifySignature}>Verify Signature</button>
-          {signature && <p>Signature: {signature}</p>}
         </div>
       ) : (
         <div>
@@ -164,7 +124,7 @@ const ConnectWallet = () => {
         </div>
       )}
 
-      {nfts.length > 0 && (
+{nfts.length > 0 && (
         <div>
           <h2>Your NFTs</h2>
           <ul>
@@ -177,14 +137,14 @@ const ConnectWallet = () => {
 
       {connected && (
         <PolygonDarkblockWidget
-          contractAddress="0x62996f945e06ddaf1f22202b7d3911ac02a6786e" // Replace with your contract address
-          tokenId="1" // Replace with your token ID
+          contractAddress="nft contract address"
+          tokenId="nft token id"
           w3={Web3}
           cb={(param) => console.log(param)}
           config={{
-            customCssClass: "",
-            debug: false,
-            imgViewer: {
+            customCssClass: "",             
+            debug: false,                   
+            imgViewer: {                    
               showRotationControl: true,
               autoHideControls: true,
               controlsFadeDelay: true,

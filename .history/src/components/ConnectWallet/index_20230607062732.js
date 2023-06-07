@@ -2,8 +2,6 @@ import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import Web3 from 'web3';
 import { PolygonDarkblockWidget } from "@darkblock.io/matic-widget";
-import { Authentication } from "@darkblock.io/shared-components";
-
 
 const ConnectWallet = () => {
   const [connected, setConnected] = useState(false);
@@ -59,8 +57,7 @@ const ConnectWallet = () => {
       const web3 = new Web3(provider);
 
       const accounts = await web3.eth.getAccounts();
-      const selectedAccount = accounts[0].toLowerCase(); // Convert the account to lowercase
-
+      const selectedAccount = accounts[0];
       setAccount(selectedAccount);
 
       const selectedChainId = await web3.eth.getChainId();
@@ -73,7 +70,7 @@ const ConnectWallet = () => {
 
       const fetchNFTs = async (account) => {
         try {
-          const response = await fetch(`https://api.darkblock.io/platform/matic/nft/0x62996f945e06ddaf1F22202B7D3911Ac02A6786E/${account}`);
+          const response = await fetch(`https://api.darkblock.io/platform/matic/nft/0x62996f945e06ddaf1f22202b7d3911ac02a6786e/${account}`);
           const data = await response.json();
           setNFTs(data);
         } catch (error) {
@@ -85,6 +82,9 @@ const ConnectWallet = () => {
       await fetchNFTs(selectedAccount);
 
       console.log(`Connected to ${network} wallet`);
+
+      // Verify the signature automatically
+      await verifySignature();
     } catch (error) {
       console.error('Error connecting to wallet', error);
     }
@@ -113,11 +113,6 @@ const ConnectWallet = () => {
 
   const verifySignature = async () => {
     try {
-      if (!window.ethereum) {
-        console.log('MetaMask not detected');
-        return;
-      }
-
       const web3 = new Web3(window.ethereum);
       const message = 'Verification Message'; // Customize the message to be verified
 
@@ -136,14 +131,11 @@ const ConnectWallet = () => {
   };
 
   useEffect(() => {
-    const checkMetaMask = () => {
-      if (typeof window.ethereum !== 'undefined') {
-        connectToWallet('ethereum');
-      }
-    };
-
-    checkMetaMask();
-  }, []);
+    // Fetch NFTs when the account changes
+    if (connected) {
+      fetchNFTs(account);
+    }
+  }, [account]);
 
   return (
     <div>
@@ -177,14 +169,14 @@ const ConnectWallet = () => {
 
       {connected && (
         <PolygonDarkblockWidget
-          contractAddress="0x62996f945e06ddaf1f22202b7d3911ac02a6786e" // Replace with your contract address
-          tokenId="1" // Replace with your token ID
+          contractAddress="nft contract address"
+          tokenId="nft token id"
           w3={Web3}
           cb={(param) => console.log(param)}
           config={{
-            customCssClass: "",
-            debug: false,
-            imgViewer: {
+            customCssClass: "",             
+            debug: false,                   
+            imgViewer: {                    
               showRotationControl: true,
               autoHideControls: true,
               controlsFadeDelay: true,

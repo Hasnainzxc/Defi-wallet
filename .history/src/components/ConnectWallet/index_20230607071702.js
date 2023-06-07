@@ -2,8 +2,6 @@ import { h } from 'preact';
 import { useState, useEffect } from 'preact/hooks';
 import Web3 from 'web3';
 import { PolygonDarkblockWidget } from "@darkblock.io/matic-widget";
-import { Authentication } from "@darkblock.io/shared-components";
-
 
 const ConnectWallet = () => {
   const [connected, setConnected] = useState(false);
@@ -111,29 +109,7 @@ const ConnectWallet = () => {
     }
   };
 
-  const verifySignature = async () => {
-    try {
-      if (!window.ethereum) {
-        console.log('MetaMask not detected');
-        return;
-      }
-
-      const web3 = new Web3(window.ethereum);
-      const message = 'Verification Message'; // Customize the message to be verified
-
-      const signedMessage = await web3.eth.personal.sign(
-        message,
-        account,
-        ''
-      );
-
-      setSignature(signedMessage);
-
-      // TODO: Send the signed message to the server for verification
-    } catch (error) {
-      console.error('Error verifying signature', error);
-    }
-  };
+  
 
   useEffect(() => {
     const checkMetaMask = () => {
@@ -177,20 +153,21 @@ const ConnectWallet = () => {
 
       {connected && (
         <PolygonDarkblockWidget
-          contractAddress="0x62996f945e06ddaf1f22202b7d3911ac02a6786e" // Replace with your contract address
-          tokenId="1" // Replace with your token ID
-          w3={Web3}
-          cb={(param) => console.log(param)}
-          config={{
-            customCssClass: "",
-            debug: false,
-            imgViewer: {
-              showRotationControl: true,
-              autoHideControls: true,
-              controlsFadeDelay: true,
-            },
-          }}
-        />
+        contractAddress="0x62996f945e06ddaf1f22202b7d3911ac02a6786e" // Replace with your contract address
+        tokenId="1" // Replace with your token ID
+        w3={Web3}
+        cb={(param) => console.log(param)}
+        config={{
+          customCssClass: "",
+          debug: false,
+          imgViewer: {
+            showRotationControl: true,
+            autoHideControls: true,
+            controlsFadeDelay: true,
+          },
+        }}
+      />
+      
       )}
     </div>
   );

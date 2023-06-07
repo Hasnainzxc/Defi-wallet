@@ -90,6 +90,12 @@ const ConnectWallet = () => {
     }
   };
 
+
+  const handleAuthentication = () => {
+    // Perform actions when authentication is successful
+    console.log('Authenticated as the owner');
+  };
+
   const disconnectWallet = async () => {
     try {
       if (typeof window.ethereum !== 'undefined') {
@@ -152,12 +158,17 @@ const ConnectWallet = () => {
           <p>Connected to {chainId}</p>
           <p>Account: {account}</p>
           <p>Balance: {balance}</p>
-          <button onClick={disconnectWallet}>Disconnect</button>
-          <button onClick={verifySignature}>Verify Signature</button>
+          <button onClick={() => setConnected(false)}>Disconnect</button>
+          <Authentication
+            contractAddress="0x62996f945e06ddaf1F22202B7D3911Ac02A6786E"
+            tokenId="1"
+            onAuthenticated={handleAuthentication}
+          />
           {signature && <p>Signature: {signature}</p>}
         </div>
       ) : (
         <div>
+           <button onClick={() => connectToWallet()}>Connect to MetaMask</button>
           <button onClick={() => connectToWallet('ethereum')}>Connect to Ethereum</button>
           <button onClick={() => connectToWallet('polygon')}>Connect to Polygon</button>
           <button onClick={() => connectToWallet('solana')}>Connect to Solana</button>
