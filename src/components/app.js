@@ -12,7 +12,7 @@ const App = () => {
   const toggleWallets = () => {
     setShowWallets(!showWallets);
   };
-
+//here all the components render
   return (
     <div id="app">
       <Header toggleWallets={toggleWallets} />
