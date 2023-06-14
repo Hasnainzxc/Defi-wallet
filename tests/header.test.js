@@ -2,7 +2,7 @@ import { h } from 'preact';
 import Header from '../src/components/header';
 // See: https://github.com/preactjs/enzyme-adapter-preact-pure
 import { shallow } from 'enzyme';
-
+//test for different chains
 describe('Initial Test of the Header', () => {
 	test('Header renders 3 nav items', () => {
 		const context = shallow(<Header />);
